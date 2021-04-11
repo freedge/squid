@@ -6010,6 +6010,15 @@ DOC_START
         sent before the required macro information is available to Squid.
 DOC_END
 
+NAME: netns
+TYPE: string
+LOC: Config.netns
+DEFAULT: none
+DOC_START
+        Listen in this network namespace. Argument should be
+        a file (for example "/var/run/netns/mynetworknamespace").
+DOC_END
+
 NAME: store_id_children storeurl_rewrite_children
 TYPE: HelperChildConfig
 DEFAULT: 20 startup=0 idle=1 concurrency=0

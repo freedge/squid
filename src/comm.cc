@@ -348,8 +348,28 @@ comm_openex(int sock_type,
 
     debugs(50, 3, "comm_openex: Attempt open socket for: " << addr );
 
+#ifndef NO_USE_NS
+    // prepare to switch to a different network namespace. Leak file descriptors
+    int default_namespace = 0, ns_fd = 0;
+    if (Config.netns) {
+        debugs(50, 3, "comm_openex: Will switch to namespace of file " << Config.netns );
+        default_namespace = open("/proc/self/ns/net", O_RDONLY);
+        ns_fd = open(Config.netns, O_RDONLY);
+
+        if (-1 == setns(ns_fd, CLONE_NEWNET))
+            debugs(50, 3, "comm_openex: setns failed: " << xstrerr(errno));
+    }
+#endif
+
     new_socket = socket(AI->ai_family, AI->ai_socktype, AI->ai_protocol);
     int xerrno = errno;
+
+#ifndef NO_USE_NS
+    if (Config.netns) {
+        if (-1 == setns(default_namespace, CLONE_NEWNET))
+            debugs(50, 3, "comm_openex: setns default failed: " << xstrerr(errno));
+    }
+#endif
 
     /* under IPv6 there is the possibility IPv6 is present but disabled. */
     /* try again as IPv4-native if possible */

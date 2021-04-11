@@ -558,6 +558,8 @@ public:
         int connect_gap;
         int connect_timeout;
     } happyEyeballs;
+
+    char *netns;
 };
 
 extern SquidConfig Config;
